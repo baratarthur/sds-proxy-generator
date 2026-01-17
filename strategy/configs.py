@@ -3,9 +3,8 @@ from helpers.write_component_helper import WriteComponentHelper
 strategy_configs = {
     "replicate": {
         "dependencies": [
-            { "lib": "network.rpc.RPCUtil", "alias": "rpcUtil" },
+            { "lib": "libs.network.rpc.RPCUtil", "alias": "rpcUtil" },
             { "lib": "data.json.JSONEncoder", "alias": "je" },
-            { "lib": "utils.PodCreatorUtil", "alias": "podCreator" },
             { "lib": "utils.Constants", "alias": None }
         ],
         "charachteristics": {
