@@ -6,7 +6,7 @@ class DidlReader:
         self.output_folder = config_json['outputFolder']
         self.component_file = config_json['componentFile']
         self.dependencies = config_json['dependencies']
-        self.attributes = config_json['attributes']
+        self.attributes = config_json['attributes']  if 'attributes' in config_json else {}
         self.methods = config_json['methods']
         self.remote_pods = remote_pods
         self.remote_name = config_json.get('remoteName', 'dana-remote')
