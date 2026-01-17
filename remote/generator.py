@@ -4,7 +4,7 @@ replicated_strategies = ['distribute']
 
 class RemoteGenerator:
     def __init__(self, file, component_name, component_package, component_deps,
-                 component_methods, connection_library="network.rpc.RPCUtil connection"):
+                 component_methods, connection_library="libs.network.rpc.RPCUtil connection"):
         self.writer = WriteComponentHelper(file)
         self.component_name = component_name
         self.component_package = component_package
