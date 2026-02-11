@@ -5,7 +5,7 @@ strategy_configs = {
         "dependencies": [
             { "lib": "libs.network.rpc.RPCUtil", "alias": "rpcUtil" },
             { "lib": "data.json.JSONEncoder", "alias": "je" },
-            { "lib": "utils.Constants", "alias": None }
+            { "lib": "libs.utils.Constants", "alias": None }
         ],
         "charachteristics": {
             "weak": [
