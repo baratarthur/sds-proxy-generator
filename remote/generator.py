@@ -1,18 +1,21 @@
 from helpers.write_component_helper import WriteComponentHelper
+from helpers.extract_helper import extract_method_information_from_interface
 
 replicated_strategies = ['distribute']
 
 class RemoteGenerator:
     def __init__(self, file, component_name, component_package, component_deps,
-                 component_methods, connection_library="libs.network.rpc.RPCUtil connection"):
+                 component_methods, interface_definitions, connection_library="libs.network.rpc.RPCUtil connection"):
         self.writer = WriteComponentHelper(file)
         self.component_name = component_name
         self.component_package = component_package
         self.component_methods = component_methods
+        self.methods_information = extract_method_information_from_interface(interface_definitions)
         self.resources = [
             "net.TCPSocket",
             "net.TCPServerSocket",
             "io.Output out",
+            "data.IntUtil iu",
             "data.json.JSONEncoder je",
             component_deps,
             connection_library,
@@ -73,11 +76,13 @@ class RemoteGenerator:
             "\n",
         ]
 
-        for method in self.component_methods:
+        method_names = [method['method'] for method in self.methods_information]
+
+        for method in method_names:
             strategies_provider.append(
                 self.writer.provide_idented_flow(f'if(method == "{method}")',[
                     self.converted_params(method),
-                    self.remote_function_call(method),
+                    self.function_call(method),
                     self.return_value(method)
                 ])
             )
@@ -86,29 +91,25 @@ class RemoteGenerator:
         return self.writer.provide_idented_flow("Response process(Request req)", strategies_provider)
     
     def converted_params(self, method) -> str:
-        method_configs = self.component_methods[method]
-        has_params = len(method_configs['parameters']) > 0
+        method_infos = next((info for info in self.methods_information if info['method'] == method), None)
+        have_params = len(method_infos['parameters']) > 0
         parameters_format_type = f"{method[0].upper() + method[1:]}ParamsFormat"
-        return f"{parameters_format_type} paramsData = je.jsonToData(req.content, typeof({parameters_format_type}))" if has_params else None
+        return f"{parameters_format_type} paramsData = je.jsonToData(req.content, typeof({parameters_format_type}))" if have_params else None
     
-    def remote_function_call(self, method) -> str:
-        method_configs = self.component_methods[method]
-        has_params = len(method_configs['parameters']) > 0
-        is_collection_result = '[]' in method_configs['returnType']
-        should_return_data = 'remoteReturnParser' in method_configs
+    def function_call(self, method) -> str:
+        method_infos = next((info for info in self.methods_information if info['method'] == method), None)
+        is_collection_result = '[]' in method_infos['return_type']
+        should_return_data = method_infos['return_type'] != 'void'
 
-        store_result = f"{method_configs['returnType'].replace('[]', '') if is_collection_result else method_configs['returnType']} result{'[]' if is_collection_result else ''} = "
-        return f"{store_result if should_return_data else ''}remoteComponent.{method}({self.provide_virables_for_method(method_configs) if has_params else ''})"
+        store_result = f"{method_infos['return_type'].replace('[]', '') if is_collection_result else method_infos['return_type']} result{'[]' if is_collection_result else ''} = "
+        return f"{store_result if should_return_data else ''}remoteComponent.{method}({self.provide_virables_for_method(method_infos)})"
     
     def return_value(self, method) -> str:
-        method_configs = self.component_methods[method]
-        should_return_data = 'remoteReturnParser' in method_configs
+        method_config = self.component_methods[method] if method in self.component_methods else {}
+        method_infos = next((info for info in self.methods_information if info['method'] == method), None)
+        should_return_data = method_infos['return_type'] != 'void'
 
-        return f'return connection.{"buildResponseWithData" if should_return_data else "buildResponse"}("{method}", "200"{", " + method_configs["remoteReturnParser"].format("result") if should_return_data else ""})'
+        return f'return connection.{"buildResponseWithData" if should_return_data else "buildResponse"}("{method}", "200"{", " + method_config["remoteReturnParser"].format("result") if should_return_data else ""})'
 
     def provide_virables_for_method(self, method_config) -> str:
-        def get_formated_parser(param):
-            should_parse_variable = 'variableParser' in param
-            return param['variableParser'].format(f"paramsData.{param['name']}") if should_parse_variable else f"paramsData.{param['name']}"
-
-        return ",".join([f"{get_formated_parser(param)}" for param in method_config['parameters']])    
+        return ",".join([f"paramsData.{param.split(' ')[-1].replace('[]', '')}" for param in method_config['parameters']])    

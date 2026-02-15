@@ -2,14 +2,12 @@ import json
 
 class DidlReader:
     def __init__(self, json_path, remote_pods: int = 2):
-        config_json = json.load(json_path)
-        self.output_folder = config_json['outputFolder']
-        self.component_file = config_json['componentFile']
-        self.dependencies = config_json['dependencies']
-        self.attributes = config_json['attributes']  if 'attributes' in config_json else {}
-        self.methods = config_json['methods']
+        didl_config = json.load(json_path)
+        self.dependencies = didl_config['dependencies']
+        self.attributes = didl_config['attributes']  if 'attributes' in didl_config else {}
+        self.methods = didl_config['methods']
         self.remote_pods = remote_pods
-        self.remote_name = config_json.get('remoteName', 'dana-remote')
+        self.remote_name = didl_config.get('remoteName', 'dana-remote')
     
     def calculate_on_active(self, strategy: str, type: str) -> list:
         instructions = [
