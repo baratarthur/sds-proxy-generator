@@ -59,19 +59,19 @@ for file_config in idl_resources:
 
             with open(output_file_path, "w") as out_file:
                 writer = WriteComponentHelper(out_file)
-                dependencies = [*didl_config.dependencies, *strategy_configs[strategy]["dependencies"], *extract_component_dependencies(component_implementations)]
+                dependencies = [*didl_config.dependencies, *strategy_configs[strategy]["dependencies"]]
                 component_header = HeaderGenerator(file_config["interface_location"], filter_unique(dependencies))
                 ComponentMethods = MethodsGenerator(didl_config.methods, component_header.get_interface_name(),
                                                     didl_config.attributes, component_implementations, interface_definitions, strategy)
                 ComponentAdaptation = AdaptationGenerator(writer, didl_config.calculate_on_active(strategy, charachteristic),
-                                                            didl_config.calculate_on_inactive())
+                                                        didl_config.calculate_on_inactive(strategy, charachteristic))
 
                 component = component_header.get_component_flow(writer)
                 component(writer, [
                     component_header.provide_addresses(),
                     *component_header.provide_pointer(),
                     "",
-                    *ComponentMethods.provide_methods(writer),
+                    *ComponentMethods.provide_methods(writer, strategy),
                     *[factory(writer) for factory in strategy_configs[strategy]["charachteristics"][charachteristic]],
                     ComponentAdaptation.provide_on_active(),
                     ComponentAdaptation.provide_on_inactive(),
