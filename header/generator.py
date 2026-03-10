@@ -28,7 +28,7 @@ class HeaderGenerator:
         return ", ".join([f"{dep['lib']} {dep['alias']}" for dep in dependencies if dep['alias'] != None])
     
     def provide_addresses(self) -> str:
-        var_assign = f"Address remotes[] = new Address[]"
+        var_assign = f"Address remotes[] = new Address[]()"
         return var_assign
     
     def provide_pointer(self) -> list:
