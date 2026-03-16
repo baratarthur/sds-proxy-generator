@@ -70,6 +70,8 @@ class MethodsGenerator:
                     .* # Qualquer coisa após a atribuição até o fim da linha
                 """, re.VERBOSE)
 
+                if 'skip' in self.attributes[attribute] and self.attributes[attribute]['skip']: continue
+
                 lines_with_state_change = []
                 for line in method_implementation_code.split('\n'):
                     if line.strip().startswith("//"): continue
