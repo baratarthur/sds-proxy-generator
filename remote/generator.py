@@ -14,7 +14,7 @@ class RemoteGenerator:
         self.resources = [
             "net.TCPSocket",
             "net.TCPServerSocket",
-            "io.Output out",
+            "libs.utils.Logger logger",
             "data.IntUtil iu",
             "data.json.JSONEncoder je",
             component_deps,
@@ -49,10 +49,10 @@ class RemoteGenerator:
             "serviceStatus = true",
             "\n",
             self.writer.provide_idented_flow("if (!host.bind(TCPServerSocket.ANY_ADDRESS, PORT))", [
-                'out.println("Error: failed to bind master socket")',
+                'logger.error("Error: failed to bind master socket")',
                 "return"
             ]),
-            'out.println("$debugMSG - Server started on port $(iu.makeString(PORT))")',
+            'logger.info("$debugMSG - Server started on port $(iu.makeString(PORT))")',
             self.writer.provide_idented_flow("while (serviceStatus)", [
                 "TCPSocket client = new TCPSocket()",
                 "if (client.accept(host)) asynch::handleRequest(client)"
