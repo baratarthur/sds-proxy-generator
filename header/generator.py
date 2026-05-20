@@ -13,7 +13,7 @@ class HeaderGenerator:
         writer.write_idented(self.general_dependencies)
         writer.break_line()
 
-        return writer.use_idented_flow(f"component provides {self.name}(AdaptEvents) {self.get_component_definition()}")
+        return writer.use_idented_flow(f"component provides {self.name}(AdaptEvents), libs.krabs.RemotesHandler {self.get_component_definition()}")
 
     def get_component_definition(self) -> str:
         return "requires " + self.component_dependencies if self.component_dependencies != "" else ""
@@ -28,7 +28,7 @@ class HeaderGenerator:
         return ", ".join([f"{dep['lib']} {dep['alias']}" for dep in dependencies if dep['alias'] != None])
     
     def provide_addresses(self) -> str:
-        var_assign = f"Address remotes[] = new Address[]()"
+        var_assign = f"static Address remotes[] = new Address[]()"
         return var_assign
     
     def provide_pointer(self) -> list:

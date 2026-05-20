@@ -69,12 +69,23 @@ for file_config in idl_resources:
                 component = component_header.get_component_flow(writer)
                 component(writer, [
                     component_header.provide_addresses(),
-                    *component_header.provide_pointer(),
                     "",
-                    *ComponentMethods.provide_methods(writer, strategy),
-                    *[factory(writer) for factory in strategy_configs[strategy]["charachteristics"][charachteristic]],
-                    ComponentAdaptation.provide_on_active(),
-                    ComponentAdaptation.provide_on_inactive(),
+                    writer.provide_idented_flow("implementation RemotesHandler", [
+                        writer.provide_idented_flow("void RemotesHandler:setRemotes(store Address newRemotes[])", [
+                            "remotes = newRemotes"
+                        ]),
+                        writer.provide_idented_flow("Address[] RemotesHandler:getRemotes()", [
+                            "return remotes"
+                        ]),
+                    ]),
+                    writer.provide_idented_flow(f"implementation {component_header.name.split('.')[-1]}", [
+                        *component_header.provide_pointer(),
+                        "",
+                        *ComponentMethods.provide_methods(writer, strategy),
+                        *[factory(writer) for factory in strategy_configs[strategy]["charachteristics"][charachteristic]],
+                        # ComponentAdaptation.provide_on_active(),
+                        # ComponentAdaptation.provide_on_inactive(),
+                    ]),
                 ])
 
     component_name = file_config["file"].replace(f".{IDL_EXTENSION}", "")
