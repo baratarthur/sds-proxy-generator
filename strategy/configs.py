@@ -5,7 +5,6 @@ strategy_configs = {
         "dependencies": [
             { "lib": "libs.network.rpc.RPCUtil", "alias": "rpcUtil" },
             { "lib": "data.json.JSONEncoder", "alias": "je" },
-            { "lib": "libs.adaptation.AddressHandler", "alias": "ah" },
             { "lib": "libs.utils.Constants", "alias": None }
         ],
         "charachteristics": {
@@ -56,7 +55,6 @@ strategy_configs = {
         "dependencies": [
             { "lib": "libs.network.rpc.RPCUtil", "alias": "rpcUtil" },
             { "lib": "data.json.JSONEncoder", "alias": "je" },
-            { "lib": "libs.adaptation.AddressHandler", "alias": "ah" },
             { "lib": "libs.utils.Constants", "alias": None }
         ],
         "charachteristics": {

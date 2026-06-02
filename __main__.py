@@ -63,8 +63,7 @@ for file_config in idl_resources:
                 component_header = HeaderGenerator(file_config["interface_location"], filter_unique(dependencies))
                 ComponentMethods = MethodsGenerator(didl_config.methods, component_header.get_interface_name(),
                                                     didl_config.attributes, component_implementations, interface_definitions, strategy)
-                ComponentAdaptation = AdaptationGenerator(writer, didl_config.calculate_on_active(strategy, charachteristic),
-                                                        didl_config.calculate_on_inactive(strategy, charachteristic))
+                ComponentAdaptation = AdaptationGenerator(writer, strategy, charachteristic)
 
                 component = component_header.get_component_flow(writer)
                 component(writer, [
@@ -83,8 +82,8 @@ for file_config in idl_resources:
                         "",
                         *ComponentMethods.provide_methods(writer, strategy),
                         *[factory(writer) for factory in strategy_configs[strategy]["charachteristics"][charachteristic]],
-                        # ComponentAdaptation.provide_on_active(),
-                        # ComponentAdaptation.provide_on_inactive(),
+                        ComponentAdaptation.provide_on_load_remote_state(),
+                        ComponentAdaptation.provide_on_update_local_state(),
                     ]),
                 ])
 

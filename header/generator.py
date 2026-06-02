@@ -13,7 +13,7 @@ class HeaderGenerator:
         writer.write_idented(self.general_dependencies)
         writer.break_line()
 
-        return writer.use_idented_flow(f"component provides {self.name}(AdaptEvents), libs.krabs.RemotesHandler {self.get_component_definition()}")
+        return writer.use_idented_flow(f"component provides {self.name}(libs.adaptation.AdaptationLyfecicle), libs.krabs.RemotesHandler {self.get_component_definition()}")
 
     def get_component_definition(self) -> str:
         return "requires " + self.component_dependencies if self.component_dependencies != "" else ""
