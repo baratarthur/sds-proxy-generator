@@ -4,7 +4,7 @@ from helpers.extract_helper import extract_component_dependencies, filter_unique
 from helpers.write_component_helper import WriteComponentHelper
 from header.generator import HeaderGenerator
 from methods.generator import MethodsGenerator
-from strategy.configs import strategy_configs
+from strategy.configs import strategy_configs, default_config
 from adaptation.generator import AdaptationGenerator
 from remote.generator import RemoteGenerator
 
@@ -81,6 +81,7 @@ for file_config in idl_resources:
                         *component_header.provide_pointer(),
                         "",
                         *ComponentMethods.provide_methods(writer, strategy),
+                        *[factory(writer) for factory in default_config["include_methods"]],
                         *[factory(writer) for factory in strategy_configs[strategy]["charachteristics"][charachteristic]],
                         ComponentAdaptation.provide_on_load_remote_state(),
                         ComponentAdaptation.provide_on_update_local_state(),

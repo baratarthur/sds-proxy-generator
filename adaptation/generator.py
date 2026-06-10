@@ -14,19 +14,14 @@ class AdaptationGenerator:
     
     def calculate_on_load_remote_state(self) -> list:
         instructions = []
-        # for attribute in self.attributes:
-        #     if 'calculateWith' in self.attributes[attribute]:
-        #         instructions.append(f"{self.attributes[attribute]['calculateWith']}({attribute})")
-        #     elif 'calculateWithEach' in self.attributes[attribute]:
-        #         instructions.append(f"for(int i = 0; i < {attribute}.arrayLength; i++)" + "{")
-        #         instructions.append(f"\t{self.attributes[attribute]['calculateWithEach']}({attribute}[i])")
-        #         instructions.append("}")
         instructions.append("return true")
         return instructions
 
     def calculate_on_update_local_state(self) -> list:
-        instructions = []
-        # for attribute in self.attributes:
-        #     instructions.append(f"{attribute} = get{attribute[0].upper() + attribute[1:]}()")
+        instructions = [
+            'char requestBody[] = ""',
+			'Request req = new Request(buildMetaForMethod("clearState"), requestBody)'
+			'broadcast(req)'
+        ]
         instructions.append("return true")
         return instructions

@@ -1,5 +1,21 @@
 from helpers.write_component_helper import WriteComponentHelper
 
+default_config = {
+    "include_methods": [
+        lambda file: WriteComponentHelper(file).provide_idented_flow("Response[] broadcastList(Request r)", [
+            "Response res[]",
+            WriteComponentHelper(file).provide_idented_flow("mutex(pointerLock)", [
+                WriteComponentHelper(file).provide_idented_flow("for(int i = 0; i < remotes.arrayLength; i++)", [
+                    "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
+                    "Reponse singleRes = rpcUtil.make(reqWrapper)",
+                    "res = new Response[](res, singleRes)"
+                ])
+            ]),
+            "return res"
+        ]),
+    ] 
+}
+
 strategy_configs = {
     "replicate": {
         "dependencies": [
@@ -45,6 +61,7 @@ strategy_configs = {
                 ])
             ]
         },
+        "state_spliting": [],
         "methods": {
             "write": "broadcast",
             "read": "anycast",
@@ -87,6 +104,7 @@ strategy_configs = {
                 ])
             ],
         },
+        "state_spliting": [],
         "methods": {
             "write": "hashcast",
             "read": "hashcast",

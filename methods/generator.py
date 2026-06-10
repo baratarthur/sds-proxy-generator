@@ -101,13 +101,13 @@ class MethodsGenerator:
             should_return_value = method_infos['return_type'] != 'void'
 
             print(f"Method: {method}, changes state: {method_changes_state > 0}, reads state: {method_reads_state > 0}, distribution type: {distribution_type}")
-            distributeion_params = f"req{', ' + method_props['hashKey'] if strategy == 'fragment' and self.distribution_configs['methods'][distribution_type] == 'hashcast' else ''}"
+            distribution_params = f"req{', ' + method_props['hashKey'] if strategy == 'fragment' and self.distribution_configs['methods'][distribution_type] == 'hashcast' else ''}"
 
             methods.append(writer.provide_idented_flow(method_header, [
                 builder.generate_params_packing() if have_params else None,
                 "char requestBody[] = je.jsonFromData(params)" if have_params else 'char requestBody[] = ""',
                 f"Request req = new Request(buildMetaForMethod(\"{method}\"), requestBody)",
-                f"{'Response res = ' if should_return_value else ''}{self.distribution_configs['methods'][distribution_type]}({distributeion_params})",
+                f"{'Response res = ' if should_return_value else ''}{self.distribution_configs['methods'][distribution_type]}({distribution_params})",
                 f"return {method_props['returnParser'].format('res.content') if 'returnParser' in method_props else 'res.content'}" if should_return_value else None,
             ]))
 
