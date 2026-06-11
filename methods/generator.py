@@ -2,6 +2,7 @@ import re
 from helpers.extract_helper import extract_method_information_from_interface
 from helpers.write_component_helper import WriteComponentHelper
 from strategy.configs import strategy_configs
+from config import special_methods
 
 class MethodsGenerator:
     def __init__(self, methods, interface_name, attributes, component_implementations, interface_definitions, startegy):
@@ -70,8 +71,6 @@ class MethodsGenerator:
                     .* # Qualquer coisa após a atribuição até o fim da linha
                 """, re.VERBOSE)
 
-                if 'skip' in self.attributes[attribute] and self.attributes[attribute]['skip']: continue
-
                 lines_with_state_change = []
                 for line in method_implementation_code.split('\n'):
                     if line.strip().startswith("//"): continue
@@ -101,15 +100,46 @@ class MethodsGenerator:
             should_return_value = method_infos['return_type'] != 'void'
 
             print(f"Method: {method}, changes state: {method_changes_state > 0}, reads state: {method_reads_state > 0}, distribution type: {distribution_type}")
-            distribution_params = f"req{', ' + method_props['hashKey'] if strategy == 'fragment' and self.distribution_configs['methods'][distribution_type] == 'hashcast' else ''}"
+            if strategy == "fragment" and "onMerge" in method_props:
+                '''
+                Response responses[] = broadcastList(req)
+                Post returnValue[]
+                for(int i = 0; i < responses.arrayLength; i++) {
+                    Post partialPost[] = je.jsonToArray(responses[i].content, typeof(Post[]))
+                    returnValue = accummulate(returnValue, partialPost)
+                }
+                return returnValue
+                '''
 
-            methods.append(writer.provide_idented_flow(method_header, [
-                builder.generate_params_packing() if have_params else None,
-                "char requestBody[] = je.jsonFromData(params)" if have_params else 'char requestBody[] = ""',
-                f"Request req = new Request(buildMetaForMethod(\"{method}\"), requestBody)",
-                f"{'Response res = ' if should_return_value else ''}{self.distribution_configs['methods'][distribution_type]}({distribution_params})",
-                f"return {method_props['returnParser'].format('res.content') if 'returnParser' in method_props else 'res.content'}" if should_return_value else None,
-            ]))
+                methods.append(writer.provide_idented_flow(method_header, [
+                    builder.generate_params_packing() if have_params else None,
+                    "char requestBody[] = je.jsonFromData(params)" if have_params else 'char requestBody[] = ""',
+                    f"Request req = new Request(buildMetaForMethod(\"{method}\"), requestBody)",
+                    f"Response res[] = broadcastList(req)",
+                    f"{method_infos['return_type']} returnValue[]",
+                    writer.provide_idented_flow("for(int i = 0; i < responses.arrayLength; i++)", [
+                        f"{method_infos['return_type']} partialValue[] = je.jsonToArray(responses[i].content, typeof({method_infos['return_type']}[]))",
+                        f"returnValue = {method_props['onMerge']}(returnValue, partialValue)"
+                    ]),
+                    "return returnValue"
+                ]))
+            else:
+                '''
+                Response res = anycast(req)
+                return je.jsonToArray(res.content, typeof(Post[]))
+                '''
+                remote_execution_type = special_methods[method]['distribution_type'] if method in special_methods else self.distribution_configs['methods'][distribution_type]
+                distribution_params = f"req{', ' + method_props['hashKey'] if strategy == 'fragment' and remote_execution_type == 'hashcast' else ''}"
+                remote_method_call = f"{'Response res = ' if should_return_value else ''}{remote_execution_type}({distribution_params})"
+                function_return = f"return {method_props['returnParser'].format('res.content') if 'returnParser' in method_props else 'res.content'}" if should_return_value else None
+
+                methods.append(writer.provide_idented_flow(method_header, [
+                    builder.generate_params_packing() if have_params else None,
+                    "char requestBody[] = je.jsonFromData(params)" if have_params else 'char requestBody[] = ""',
+                    f"Request req = new Request(buildMetaForMethod(\"{method}\"), requestBody)",
+                    remote_method_call,
+                    function_return,
+                ]))
 
         return methods
 
