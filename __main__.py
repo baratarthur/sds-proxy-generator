@@ -63,7 +63,7 @@ for file_config in idl_resources:
                 component_header = HeaderGenerator(file_config["interface_location"], filter_unique(dependencies))
                 ComponentMethods = MethodsGenerator(didl_config.methods, component_header.get_interface_name(),
                                                     didl_config.attributes, component_implementations, interface_definitions, strategy)
-                ComponentAdaptation = AdaptationGenerator(writer, strategy, charachteristic)
+                ComponentAdaptation = AdaptationGenerator(writer, didl_config.attributes, strategy, charachteristic)
 
                 component = component_header.get_component_flow(writer)
                 component(writer, [
