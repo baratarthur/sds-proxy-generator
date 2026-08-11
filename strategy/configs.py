@@ -30,24 +30,24 @@ strategy_configs = {
             "weak": [
                 lambda file: WriteComponentHelper(file).provide_idented_flow("Response broadcast(Request r)", [
                     "Response res",
-                    WriteComponentHelper(file).provide_idented_flow("mutex(pointerLock)", [
-                        WriteComponentHelper(file).provide_idented_flow("for(int i = 0; i < remotes.arrayLength; i++)", [
-                            "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
-                            "res = rpcUtil.make(reqWrapper)"
-                        ])
+                    WriteComponentHelper(file).provide_idented_flow("for(int i = 0; i < remotes.arrayLength; i++)", [
+                        "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
+                        "res = rpcUtil.make(reqWrapper)"
                     ]),
+                    # WriteComponentHelper(file).provide_idented_flow("mutex(pointerLock)", [
+                    # ]),
                     "return res"
                 ])
             ],
             "strong": [
                 lambda file: WriteComponentHelper(file).provide_idented_flow("Response broadcast(Request r)", [
                     "Response res",
-                    WriteComponentHelper(file).provide_idented_flow("mutex(pointerLock)", [
-                        WriteComponentHelper(file).provide_idented_flow("for(int i = 0; i < remotes.arrayLength; i++)", [
-                            "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
-                            "res = rpcUtil.make(reqWrapper)"
-                        ])
+                    WriteComponentHelper(file).provide_idented_flow("for(int i = 0; i < remotes.arrayLength; i++)", [
+                        "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
+                        "res = rpcUtil.make(reqWrapper)"
                     ]),
+                    # WriteComponentHelper(file).provide_idented_flow("mutex(pointerLock)", [
+                    # ]),
                     "return res"
                 ])
             ]
@@ -73,11 +73,11 @@ strategy_configs = {
             ],
             "strong": [
                 lambda file: WriteComponentHelper(file).provide_idented_flow("Response hashcast(Request r, int hashKey)", [
-                    WriteComponentHelper(file).provide_idented_flow("mutex(pointerLock)", [
-                        "int i = hashKey % remotes.arrayLength",
-                        "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
-                        "return rpcUtil.make(reqWrapper)"
-                    ])
+                    "int i = hashKey % remotes.arrayLength",
+                    "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
+                    "return rpcUtil.make(reqWrapper)"
+                    # WriteComponentHelper(file).provide_idented_flow("mutex(pointerLock)", [
+                    # ])
                 ])
             ],
         },
