@@ -92,7 +92,8 @@ class MethodsGenerator:
                 if method_changes_state > 0: distribution_type = "write"
                 elif method_reads_state > 0: distribution_type = "read"
             elif strategy == 'fragment':
-                if method_changes_state > 0:
+                if 'global' in method_props and method_props['global'] == True: distribution_type = "global"
+                elif method_changes_state > 0:
                     if "balance" in method_props: distribution_type = "write_many"
                     else: distribution_type = "write_one"
                 elif method_reads_state > 0:

@@ -85,7 +85,8 @@ strategy_configs = {
             "write_one": "hashcast",
             "write_many": ("split", "hashcast"),
             "read_one": "hashcast",
-            "read_many": ("combine", "broadcastList")
+            "read_many": ("combine", "broadcastList"),
+            "global": "broadcastList",
         }
     }
 }
