@@ -15,7 +15,22 @@ default_config = {
             "int i = addressPointer++ % remotes.arrayLength",
             "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
             "return rpcUtil.make(reqWrapper)"
-        ])
+        ]),
+        lambda file: WriteComponentHelper(file).provide_idented_flow("void nonBlockingBroadcastList(Request r)", [
+            "Response res[] = new Response[]()",
+            "Thread threads[] = new Thread[]()",
+            WriteComponentHelper(file).provide_idented_flow("for(int i = 0; i < remotes.arrayLength; i++)", [
+                "Thread t = asynch::makeNonBlockingRequest(r, i)",
+                "threads = new Thread[](threads, t)"
+            ]),
+            WriteComponentHelper(file).provide_idented_flow("for(int i = 0; i < threads.arrayLength; i++)", [
+                "threads[i].join()"
+            ]),
+        ]),
+        lambda file: WriteComponentHelper(file).provide_idented_flow("void makeNonBlockingRequest(Request r, int i)", [
+            "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
+            "rpcUtil.make(reqWrapper)"
+        ]),
     ] 
 }
 
@@ -86,7 +101,7 @@ strategy_configs = {
             "write_many": ("split", "hashcast"),
             "read_one": "hashcast",
             "read_many": ("combine", "broadcastList"),
-            "global": "broadcastList",
+            "global": "nonBlockingBroadcastList",
         }
     }
 }
