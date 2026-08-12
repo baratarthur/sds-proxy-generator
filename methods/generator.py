@@ -192,6 +192,8 @@ class MethodsGenerator:
                 function_return = f"return {method_props['returnParser'].format('res.content') if 'returnParser' in method_props else 'res.content'}" if should_return_value else None
 
                 methods.append(writer.provide_idented_flow(method_header, [
+                    'int timeToReachComponentProxy = ls.getMilisecondsExecutionTimeSince(timeToAccess)' if 'timeToAccess' in method_header else None,
+                    'logger.storeInfo("{\\"timeToAccessProxy\\": \\"$(iu.makeString(timeToReachComponentProxy))\\"}")' if 'timeToAccess' in method_header else None,
                     builder.generate_params_packing() if have_params else None,
                     "char requestBody[] = je.jsonFromData(params)" if have_params else 'char requestBody[] = ""',
                     f"Request req = new Request(buildMetaForMethod(\"{method}\"), requestBody)",

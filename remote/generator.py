@@ -14,8 +14,8 @@ class RemoteGenerator:
         self.resources = [
             "net.TCPSocket",
             "net.TCPServerSocket",
-            "libs.utils.Logger logger",
-            "data.IntUtil iu",
+            # "libs.utils.Logger logger",
+            # "data.IntUtil iu",
             "data.json.JSONEncoder je",
             component_deps,
             connection_library,
