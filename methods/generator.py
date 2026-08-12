@@ -96,7 +96,8 @@ class MethodsGenerator:
                     if "balance" in method_props: distribution_type = "write_many"
                     else: distribution_type = "write_one"
                 elif method_reads_state > 0:
-                    if "onMerge" in method_props: distribution_type = "read_many"
+                    if "dontMerge" in method_props and method_props["dontMerge"] == True: distribution_type = "no_state"
+                    elif "onMerge" in method_props: distribution_type = "read_many"
                     else: distribution_type = "read_one"
 
             method_header = f"{method_infos['return_type']} {self.interface_name}:{method}({', '.join(method_infos['parameters'])})"
