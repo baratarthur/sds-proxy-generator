@@ -1,5 +1,5 @@
 special_methods = {
     "clearState": {
-        "distribution_type": "broadcastList",
+        "distribution_type": "nonBlockingBroadcastList",
     }
 }

@@ -176,8 +176,6 @@ class MethodsGenerator:
                             f"{strategy_configs[strategy]['methods'][distribution_type][1]}(req, i)"
                         ]),
                     ]))
-
-
             else:
                 '''
                 Response res = anycast(req)
