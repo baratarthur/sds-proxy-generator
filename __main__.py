@@ -53,40 +53,39 @@ for file_config in idl_resources:
     # print(interface_definitions)
 
     for strategy in strategy_configs:
-        for charachteristic in strategy_configs[strategy]["charachteristics"]:
-            proxy_file_name = didl_filepath.split("/")[-1].replace(f".{IDL_EXTENSION}", f".proxy.{strategy}.{charachteristic}.dn")
-            output_file_path = f"{file_config['target_location']}/{proxy_file_name}"
+        proxy_file_name = didl_filepath.split("/")[-1].replace(f".{IDL_EXTENSION}", f".proxy.{strategy}.dn")
+        output_file_path = f"{file_config['target_location']}/{proxy_file_name}"
 
-            with open(output_file_path, "w") as out_file:
-                writer = WriteComponentHelper(out_file)
-                dependencies = [*didl_config.dependencies, *strategy_configs[strategy]["dependencies"]]
-                component_header = HeaderGenerator(file_config["interface_location"], filter_unique(dependencies))
-                ComponentMethods = MethodsGenerator(didl_config.methods, component_header.get_interface_name(),
-                                                    didl_config.attributes, component_implementations, interface_definitions, strategy)
-                ComponentAdaptation = AdaptationGenerator(writer, didl_config.attributes, strategy, charachteristic)
+        with open(output_file_path, "w") as out_file:
+            writer = WriteComponentHelper(out_file)
+            dependencies = [*didl_config.dependencies, *strategy_configs[strategy]["dependencies"]]
+            component_header = HeaderGenerator(file_config["interface_location"], filter_unique(dependencies))
+            ComponentMethods = MethodsGenerator(didl_config.methods, component_header.get_interface_name(),
+                                                didl_config.attributes, component_implementations, interface_definitions, strategy)
+            ComponentAdaptation = AdaptationGenerator(writer, didl_config.attributes, strategy)
 
-                component = component_header.get_component_flow(writer)
-                component(writer, [
-                    component_header.provide_addresses(),
+            component = component_header.get_component_flow(writer)
+            component(writer, [
+                component_header.provide_addresses(),
+                "",
+                writer.provide_idented_flow("implementation RemotesHandler", [
+                    writer.provide_idented_flow("void RemotesHandler:setRemotes(store Address newRemotes[])", [
+                        "remotes = newRemotes"
+                    ]),
+                    writer.provide_idented_flow("Address[] RemotesHandler:getRemotes()", [
+                        "return remotes"
+                    ]),
+                ]),
+                writer.provide_idented_flow(f"implementation {component_header.name.split('.')[-1]}", [
+                    *component_header.provide_pointer(),
                     "",
-                    writer.provide_idented_flow("implementation RemotesHandler", [
-                        writer.provide_idented_flow("void RemotesHandler:setRemotes(store Address newRemotes[])", [
-                            "remotes = newRemotes"
-                        ]),
-                        writer.provide_idented_flow("Address[] RemotesHandler:getRemotes()", [
-                            "return remotes"
-                        ]),
-                    ]),
-                    writer.provide_idented_flow(f"implementation {component_header.name.split('.')[-1]}", [
-                        *component_header.provide_pointer(),
-                        "",
-                        *ComponentMethods.provide_methods(writer, strategy),
-                        *[factory(writer) for factory in default_config["include_methods"]],
-                        *[factory(writer) for factory in strategy_configs[strategy]["charachteristics"][charachteristic]],
-                        ComponentAdaptation.provide_on_load_remote_state(),
-                        ComponentAdaptation.provide_on_update_local_state(),
-                    ]),
-                ])
+                    *ComponentMethods.provide_methods(writer, strategy),
+                    *[factory(writer) for factory in default_config["include_methods"]],
+                    *[factory(writer) for factory in strategy_configs[strategy]["distribution_methods"]],
+                    ComponentAdaptation.provide_on_load_remote_state(),
+                    ComponentAdaptation.provide_on_update_local_state(),
+                ]),
+            ])
 
     component_name = file_config["file"].replace(f".{IDL_EXTENSION}", "")
     component_package = ".".join(file_config['path'].replace("resources/", "").split('/'))

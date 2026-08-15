@@ -23,20 +23,12 @@ strategy_configs = {
             { "lib": "libs.utils.Constants", "alias": None },
             { "lib": "libs.network.rpc.NonBlockRPC", "alias": "nbrpcLib" }
         ],
-        "charachteristics": {
-            "weak": [
-                lambda file: WriteComponentHelper(file).provide_idented_flow("Response broadcast(Request r)", [
-                    "Response res = nonBlockingBroadcastList(r)[0]",
-                    "return res"
-                ])
-            ],
-            "strong": [
-                lambda file: WriteComponentHelper(file).provide_idented_flow("Response broadcast(Request r)", [
-                    "Response res = nonBlockingBroadcastList(r)[0]",
-                    "return res"
-                ])
-            ]
-        },
+        "distribution_methods": [
+            lambda file: WriteComponentHelper(file).provide_idented_flow("Response broadcast(Request r)", [
+                "Response res = nonBlockingBroadcastList(r)[0]",
+                "return res"
+            ])
+        ],
         "methods": {
             "write": "broadcast",
             "read": "anycast",
@@ -49,26 +41,14 @@ strategy_configs = {
             { "lib": "libs.utils.Constants", "alias": None },
             { "lib": "libs.network.rpc.NonBlockRPC", "alias": "nbrpcLib" }
         ],
-        "charachteristics": {
-            "weak": [
-                lambda file: WriteComponentHelper(file).provide_idented_flow("Response hashcast(Request r, int hashKey)", [
-                    "int i = 0",
-                    "mutex(pointerLock){ i = hashKey % remotes.arrayLength }",
-                    "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
-                    "return rpcUtil.make(reqWrapper)"
-                ])
-            ],
-            "strong": [
-                lambda file: WriteComponentHelper(file).provide_idented_flow("Response hashcast(Request r, int hashKey)", [
-                    "int i = 0",
-                    "mutex(pointerLock){ i = hashKey % remotes.arrayLength }",
-                    "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
-                    "return rpcUtil.make(reqWrapper)"
-                    # WriteComponentHelper(file).provide_idented_flow("mutex(pointerLock)", [
-                    # ])
-                ])
-            ],
-        },
+        "distribution_methods": [
+            lambda file: WriteComponentHelper(file).provide_idented_flow("Response hashcast(Request r, int hashKey)", [
+                "int i = 0",
+                "mutex(pointerLock){ i = hashKey % remotes.arrayLength }",
+                "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
+                "return rpcUtil.make(reqWrapper)"
+            ])
+        ],
         "methods": {
             "write_one": "hashcast",
             "write_many": ("split", "hashcast"),

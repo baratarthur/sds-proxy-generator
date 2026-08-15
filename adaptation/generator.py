@@ -1,10 +1,9 @@
 from helpers.write_component_helper import WriteComponentHelper
 
 class AdaptationGenerator:
-    def __init__(self, writer: WriteComponentHelper, attributes, strategy: str = None, type: str = None):
+    def __init__(self, writer: WriteComponentHelper, attributes, strategy: str = None):
         self.writer = writer
         self.strategy = strategy
-        self.type = type
         self.attributes = attributes
 
     def provide_on_load_remote_state(self):
