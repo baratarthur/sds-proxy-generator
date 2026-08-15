@@ -4,13 +4,12 @@ default_config = {
     "include_methods": [
         lambda file: WriteComponentHelper(file).provide_idented_flow("Response anycast(Request r)", [
             "int i = 0",
-            "mutex(pointerLock){ i = addressPointer++ % remotes.arrayLength }",
-            "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
-            "return rpcUtil.make(reqWrapper)"
+            "mutex(pointerLock){ i = addressPointer++ % connectionPool[i].arrayLength }",
+            "return rpcUtil.make(r, connectionPool[i])"
         ]),
         lambda file: WriteComponentHelper(file).provide_idented_flow("Response[] nonBlockingBroadcastList(Request r)", [
             "NonBlockRPC nbrpc = new NonBlockRPC()",
-            "return nbrpc.nonBlockingBroadcastList(r, remotes)"
+            "return nbrpc.nonBlockingBroadcastList(r, connectionPool)"
         ]),
     ] 
 }
@@ -20,6 +19,7 @@ strategy_configs = {
         "dependencies": [
             { "lib": "libs.network.rpc.RPCUtil", "alias": "rpcUtil" },
             { "lib": "data.json.JSONEncoder", "alias": "je" },
+            { "lib": "net.TCPSocket", "alias": "tcpSocket" },
             { "lib": "libs.utils.Constants", "alias": None },
             { "lib": "libs.network.rpc.NonBlockRPC", "alias": "nbrpcLib" }
         ],
@@ -38,15 +38,15 @@ strategy_configs = {
         "dependencies": [
             { "lib": "libs.network.rpc.RPCUtil", "alias": "rpcUtil" },
             { "lib": "data.json.JSONEncoder", "alias": "je" },
+            { "lib": "net.TCPSocket", "alias": "tcpSocket" },
             { "lib": "libs.utils.Constants", "alias": None },
             { "lib": "libs.network.rpc.NonBlockRPC", "alias": "nbrpcLib" }
         ],
         "distribution_methods": [
             lambda file: WriteComponentHelper(file).provide_idented_flow("Response hashcast(Request r, int hashKey)", [
                 "int i = 0",
-                "mutex(pointerLock){ i = hashKey % remotes.arrayLength }",
-                "RequestWrapper reqWrapper = new RequestWrapper(remotes[i], r)",
-                "return rpcUtil.make(reqWrapper)"
+                "mutex(pointerLock){ i = hashKey % connectionPool.arrayLength }",
+                "return rpcUtil.make(r, connectionPool[i])"
             ])
         ],
         "methods": {

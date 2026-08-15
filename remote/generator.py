@@ -62,14 +62,11 @@ class RemoteGenerator:
     def provide_handle_request(self):
         return self.writer.provide_idented_flow("void Remote:handleRequest(TCPSocket s)", [
             "char requestContent[] = connection.receiveData(s)",
-            "if(requestContent == null) s.disconnect()",
+            "if(requestContent == null) return",
             "Request req = connection.parseRequestFromString(requestContent)",
             "Response res = process(req)",
             "char rawResponse[] = connection.buildRawResponse(res)",
             "s.send(rawResponse)",
-            "byte ack[] = s.recv(3)",
-            "char ackStr[] = new char[](ack)",
-            "if(ackStr == \"ACK\") s.disconnect()",
         ])
 
     def provide_processing_method(self):

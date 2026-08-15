@@ -162,7 +162,7 @@ class MethodsGenerator:
                     param_name = method_props['balance']
                     hashkey = method_props['hashkey']
                     methods.append(writer.provide_idented_flow(method_header, [
-                        "int spaceSize = remotes.arrayLength",
+                        "int spaceSize = connectionPool.arrayLength",
                         writer.provide_idented_flow("for(int i = 0; i < spaceSize; i++)", [
                             f"{param_type} subset[] = new {param_type}[]()",
                             writer.provide_idented_flow(f"for(int j = 0; j < {param_name}.arrayLength; j++)", [
