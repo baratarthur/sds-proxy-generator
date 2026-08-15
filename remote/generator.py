@@ -67,7 +67,9 @@ class RemoteGenerator:
             "Response res = process(req)",
             "char rawResponse[] = connection.buildRawResponse(res)",
             "s.send(rawResponse)",
-            "s.disconnect()",
+            "byte ack[] = s.recv(3)",
+            "char ackStr[] = new char[](ack)",
+            "if(ackStr == \"ACK\") s.disconnect()",
         ])
 
     def provide_processing_method(self):
