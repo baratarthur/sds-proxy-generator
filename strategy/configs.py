@@ -4,12 +4,12 @@ default_config = {
     "include_methods": [
         lambda file: WriteComponentHelper(file).provide_idented_flow("Response anycast(Request r)", [
             "int i = 0",
-            "mutex(pointerLock){ i = addressPointer++ % connectionPool[i].arrayLength }",
-            "return rpcUtil.make(r, connectionPool[i], i)"
+            "mutex(pointerLock){ i = addressPointer++ % remotes.arrayLength }",
+            "return rpcUtil.make(r, i)"
         ]),
         lambda file: WriteComponentHelper(file).provide_idented_flow("Response[] nonBlockingBroadcastList(Request r)", [
             "NonBlockRPC nbrpc = new NonBlockRPC()",
-            "return nbrpc.nonBlockingBroadcastList(r, connectionPool)"
+            "return nbrpc.nonBlockingBroadcastList(r, remotes.arrayLength)"
         ]),
     ] 
 }
@@ -45,8 +45,8 @@ strategy_configs = {
         "distribution_methods": [
             lambda file: WriteComponentHelper(file).provide_idented_flow("Response hashcast(Request r, int hashKey)", [
                 "int i = 0",
-                "mutex(pointerLock){ i = hashKey % connectionPool.arrayLength }",
-                "return rpcUtil.make(r, connectionPool[i], i)"
+                "mutex(pointerLock){ i = hashKey % remotes.arrayLength }",
+                "return rpcUtil.make(r, i)"
             ])
         ],
         "methods": {

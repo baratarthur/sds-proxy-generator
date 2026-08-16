@@ -29,7 +29,7 @@ class HeaderGenerator:
     
     def provide_addresses(self) -> list:
         return [
-            "static Pool connectionPool[] = new Pool[]()",
+            "static Address remotes[] = new Address[]()",
         ]
     
     def provide_pointer(self) -> list:

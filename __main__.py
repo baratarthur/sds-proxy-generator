@@ -70,31 +70,10 @@ for file_config in idl_resources:
                 "",
                 writer.provide_idented_flow("implementation RemotesHandler", [
                     writer.provide_idented_flow("void RemotesHandler:setRemotes(store Address newRemotes[])", [
-                        writer.provide_idented_flow("for(int i = 0; i < newRemotes.arrayLength; i++)", [
-                            "TCPSocket remoteSockets[] = new TCPSocket[]()",
-				            "Mutex remoteLocks[] = new Mutex[]()",
-                            writer.provide_idented_flow("for(int j = 0; j < Constants.CONNECTION_POOL_SIZE; j++)", [
-                                "TCPSocket s = new TCPSocket()",
-                                "Mutex lock = new Mutex()",
-                                writer.provide_idented_flow("if(!s.connect(newRemotes[i].name, newRemotes[i].port))", [
-                                    'logger.error("Error: failed to connect to remote $(newRemotes[i].name):$(iu.makeString(newRemotes[i].port))")',
-                                    "return"
-                                ]),
-                                "remoteSockets = new TCPSocket[](remoteSockets, s)",
-                                "remoteLocks = new Mutex[](remoteLocks, lock)"
-                            ]),
-                            "Pool p = new Pool(remoteSockets, remoteLocks)",
-                            "connectionPool = new Pool[](connectionPool, p)",
-                        ]),
-                        "rpcUtil.setPoolSize(connectionPool.arrayLength)",
+                        "rpcUtil.setPoolSize(newRemotes)",
+                        "remotes = newRemotes"
                     ]),
-                    writer.provide_idented_flow("void RemotesHandler:disconnectAll()", [
-                        writer.provide_idented_flow("for(int i = 0; i < connectionPool.arrayLength; i++)", [
-                            writer.provide_idented_flow("for(int j = 0; j < connectionPool[i].sockets.arrayLength; j++)", [
-                                writer.provide_idented_flow("mutex(connectionPool[i].locks[j])", [ "connectionPool[i].sockets[j].disconnect()" ])
-                            ])
-                        ]),
-                    ]),
+                    writer.provide_idented_flow("void RemotesHandler:disconnectAll()", []),
                 ]),
                 writer.provide_idented_flow(f"implementation {component_header.name.split('.')[-1]}", [
                     *component_header.provide_pointer(),
