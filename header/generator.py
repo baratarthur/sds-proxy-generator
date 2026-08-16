@@ -27,9 +27,10 @@ class HeaderGenerator:
     def static_provide_component_dependecies(dependencies) -> str:
         return ", ".join([f"{dep['lib']} {dep['alias']}" for dep in dependencies if dep['alias'] != None])
     
-    def provide_addresses(self) -> str:
-        var_assign = "static Pool connectionPool[] = new Pool[]()"
-        return var_assign
+    def provide_addresses(self) -> list:
+        return [
+            "static Pool connectionPool[] = new Pool[]()",
+        ]
     
     def provide_pointer(self) -> list:
         return ["int addressPointer = 0", "Mutex pointerLock = new Mutex()"]

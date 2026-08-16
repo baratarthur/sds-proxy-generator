@@ -5,7 +5,7 @@ default_config = {
         lambda file: WriteComponentHelper(file).provide_idented_flow("Response anycast(Request r)", [
             "int i = 0",
             "mutex(pointerLock){ i = addressPointer++ % connectionPool[i].arrayLength }",
-            "return rpcUtil.make(r, connectionPool[i])"
+            "return rpcUtil.make(r, connectionPool[i], i)"
         ]),
         lambda file: WriteComponentHelper(file).provide_idented_flow("Response[] nonBlockingBroadcastList(Request r)", [
             "NonBlockRPC nbrpc = new NonBlockRPC()",
@@ -46,7 +46,7 @@ strategy_configs = {
             lambda file: WriteComponentHelper(file).provide_idented_flow("Response hashcast(Request r, int hashKey)", [
                 "int i = 0",
                 "mutex(pointerLock){ i = hashKey % connectionPool.arrayLength }",
-                "return rpcUtil.make(r, connectionPool[i])"
+                "return rpcUtil.make(r, connectionPool[i], i)"
             ])
         ],
         "methods": {

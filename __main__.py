@@ -66,16 +66,14 @@ for file_config in idl_resources:
 
             component = component_header.get_component_flow(writer)
             component(writer, [
-                component_header.provide_addresses(),
+                *component_header.provide_addresses(),
                 "",
                 writer.provide_idented_flow("implementation RemotesHandler", [
-                    "const int POOL_SIZE = 6",
-                    "",
                     writer.provide_idented_flow("void RemotesHandler:setRemotes(store Address newRemotes[])", [
                         writer.provide_idented_flow("for(int i = 0; i < newRemotes.arrayLength; i++)", [
                             "TCPSocket remoteSockets[] = new TCPSocket[]()",
 				            "Mutex remoteLocks[] = new Mutex[]()",
-                            writer.provide_idented_flow("for(int j = 0; j < POOL_SIZE; j++)", [
+                            writer.provide_idented_flow("for(int j = 0; j < Constants.CONNECTION_POOL_SIZE; j++)", [
                                 "TCPSocket s = new TCPSocket()",
                                 "Mutex lock = new Mutex()",
                                 writer.provide_idented_flow("if(!s.connect(newRemotes[i].name, newRemotes[i].port))", [
@@ -85,9 +83,10 @@ for file_config in idl_resources:
                                 "remoteSockets = new TCPSocket[](remoteSockets, s)",
                                 "remoteLocks = new Mutex[](remoteLocks, lock)"
                             ]),
-                            "Pool p = new Pool(remoteSockets, remoteLocks, 0)",
-                            "connectionPool = new Pool[](connectionPool, p)"
+                            "Pool p = new Pool(remoteSockets, remoteLocks)",
+                            "connectionPool = new Pool[](connectionPool, p)",
                         ]),
+                        "rpcUtil.setPoolSize(connectionPool.arrayLength)",
                     ]),
                     writer.provide_idented_flow("void RemotesHandler:disconnectAll()", [
                         writer.provide_idented_flow("for(int i = 0; i < connectionPool.arrayLength; i++)", [
