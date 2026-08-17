@@ -70,7 +70,7 @@ for file_config in idl_resources:
                 "",
                 writer.provide_idented_flow("implementation RemotesHandler", [
                     writer.provide_idented_flow("void RemotesHandler:setRemotes(store Address newRemotes[])", [
-                        "rpcUtil.setPoolSize(newRemotes)",
+                        # "rpcUtil.setPoolSize(newRemotes)",
                         "remotes = newRemotes"
                     ]),
                     writer.provide_idented_flow("void RemotesHandler:disconnectAll()", []),
