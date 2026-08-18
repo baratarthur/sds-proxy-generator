@@ -137,26 +137,26 @@ class MethodsGenerator:
                 if "onMerge" in method_props:
                     clear_method_type = method_infos['return_type'].replace("[]", "")
                     methods.append(writer.provide_idented_flow(method_header, [
-                        "DateTime timeBeforeParamsPack = ic.getTime()",
+                        # "DateTime timeBeforeParamsPack = ic.getTime()",
                         builder.generate_params_packing() if have_params else None,
-                        "int timeToProcessParamsPack = ls.getMilisecondsExecutionTimeSince(timeBeforeParamsPack)",
+                        # "int timeToProcessParamsPack = ls.getMilisecondsExecutionTimeSince(timeBeforeParamsPack)",
                         "char requestBody[] = je.jsonFromData(params)" if have_params else 'char requestBody[] = ""',
-                        "DateTime timeBeforeRequestMount = ic.getTime()",
+                        # "DateTime timeBeforeRequestMount = ic.getTime()",
                         f"Request req = new Request(buildMetaForMethod(\"{method}\"), requestBody)",
-                        "int timeToProcessRequestMount = ls.getMilisecondsExecutionTimeSince(timeBeforeRequestMount)",
+                        # "int timeToProcessRequestMount = ls.getMilisecondsExecutionTimeSince(timeBeforeRequestMount)",
                         # broadcast
-                        "DateTime timeBeforeRPC = ic.getTime()",
+                        # "DateTime timeBeforeRPC = ic.getTime()",
                         f"Response res[] = {strategy_configs[strategy]['methods'][distribution_type][1]}(req)",
-                        "int timeToProcessRPC = ls.getMilisecondsExecutionTimeSince(timeBeforeRPC)",
+                        # "int timeToProcessRPC = ls.getMilisecondsExecutionTimeSince(timeBeforeRPC)",
                         # combine
-                        "DateTime timeBeforeCombine = ic.getTime()",
+                        # "DateTime timeBeforeCombine = ic.getTime()",
                         f"{clear_method_type} returnValue[]",
                         writer.provide_idented_flow("for(int i = 0; i < res.arrayLength; i++)", [
                             f"{clear_method_type} partialValue[] = je.jsonToArray(res[i].content, typeof({clear_method_type}[]))",
                             f"returnValue = {method_props['onMerge']}(returnValue, partialValue)"
                         ]),
-                        "int timeToProcessCombine = ls.getMilisecondsExecutionTimeSince(timeBeforeCombine)",
-                        'logger.storeInfo("{\\"timeToProcessParamsPack\\": \\"$(iu.makeString(timeToProcessParamsPack))\\", \\"timeToProcessRequestMount\\": \\"$(iu.makeString(timeToProcessRequestMount))\\", \\"timeToProcessRPC\\": \\"$(iu.makeString(timeToProcessRPC))\\", \\"timeToProcessCombine\\": \\"$(iu.makeString(timeToProcessCombine))\\"}")',
+                        # "int timeToProcessCombine = ls.getMilisecondsExecutionTimeSince(timeBeforeCombine)",
+                        # 'logger.storeInfo("{\\"timeToProcessParamsPack\\": \\"$(iu.makeString(timeToProcessParamsPack))\\", \\"timeToProcessRequestMount\\": \\"$(iu.makeString(timeToProcessRequestMount))\\", \\"timeToProcessRPC\\": \\"$(iu.makeString(timeToProcessRPC))\\", \\"timeToProcessCombine\\": \\"$(iu.makeString(timeToProcessCombine))\\"}")',
                         "return returnValue"
                     ]))
 
@@ -195,23 +195,23 @@ class MethodsGenerator:
                 function_return = f"{method_infos['return_type'].replace('[]', '')} response{'[]' if '[]' in method_infos['return_type'] else ''} = {method_props['returnParser'].format('res.content') if 'returnParser' in method_props else 'res.content'}" if should_return_value else None
 
                 methods.append(writer.provide_idented_flow(method_header, [
-                    'DateTime timeBeforeParamPacking = ic.getTime()',
+                    # 'DateTime timeBeforeParamPacking = ic.getTime()',
                     builder.generate_params_packing() if have_params else None,
-                    'int timeToProcessParamPacking = ls.getMilisecondsExecutionTimeSince(timeBeforeParamPacking)',
-                    'DateTime timeBeforeParsing = ic.getTime()',
+                    # 'int timeToProcessParamPacking = ls.getMilisecondsExecutionTimeSince(timeBeforeParamPacking)',
+                    # 'DateTime timeBeforeParsing = ic.getTime()',
                     "char requestBody[] = je.jsonFromData(params)" if have_params else 'char requestBody[] = ""',
-                    'int timeToProcessParsing = ls.getMilisecondsExecutionTimeSince(timeBeforeParsing)',
-                    'DateTime timeBeforeRequestMount = ic.getTime()',
+                    # 'int timeToProcessParsing = ls.getMilisecondsExecutionTimeSince(timeBeforeParsing)',
+                    # 'DateTime timeBeforeRequestMount = ic.getTime()',
                     f"Request req = new Request(buildMetaForMethod(\"{method}\"), requestBody)",
-                    'int timeToProcessRequestMount = ls.getMilisecondsExecutionTimeSince(timeBeforeRequestMount)',
-                    'DateTime timeBeforeMethodCall = ic.getTime()',
+                    # 'int timeToProcessRequestMount = ls.getMilisecondsExecutionTimeSince(timeBeforeRequestMount)',
+                    # 'DateTime timeBeforeMethodCall = ic.getTime()',
                     remote_method_call,
-                    'int timeToProcessMethodCall = ls.getMilisecondsExecutionTimeSince(timeBeforeMethodCall)',
+                    # 'int timeToProcessMethodCall = ls.getMilisecondsExecutionTimeSince(timeBeforeMethodCall)',
                     null_verification,
-                    'DateTime timeBeforeParseReturn = ic.getTime()',
+                    # 'DateTime timeBeforeParseReturn = ic.getTime()',
                     function_return,
-                    'int timeToProcessReturnParsing = ls.getMilisecondsExecutionTimeSince(timeBeforeParseReturn)',
-                    'logger.storeInfo("{\\"timeToProcessParamPacking\\": \\"$(iu.makeString(timeToProcessParamPacking))\\", \\"timeToProcessParsing\\": \\"$(iu.makeString(timeToProcessParsing))\\", \\"timeToProcessRequestMount\\": \\"$(iu.makeString(timeToProcessRequestMount))\\", \\"timeToProcessMethodCall\\": \\"$(iu.makeString(timeToProcessMethodCall))\\", \\"timeToProcessReturnParsing\\": \\"$(iu.makeString(timeToProcessReturnParsing))\\"}")',
+                    # 'int timeToProcessReturnParsing = ls.getMilisecondsExecutionTimeSince(timeBeforeParseReturn)',
+                    # 'logger.storeInfo("{\\"timeToProcessParamPacking\\": \\"$(iu.makeString(timeToProcessParamPacking))\\", \\"timeToProcessParsing\\": \\"$(iu.makeString(timeToProcessParsing))\\", \\"timeToProcessRequestMount\\": \\"$(iu.makeString(timeToProcessRequestMount))\\", \\"timeToProcessMethodCall\\": \\"$(iu.makeString(timeToProcessMethodCall))\\", \\"timeToProcessReturnParsing\\": \\"$(iu.makeString(timeToProcessReturnParsing))\\"}")',
                     "return response" if should_return_value else None
                 ]))
 
