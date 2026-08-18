@@ -1,3 +1,4 @@
+import regex
 import re
 from helpers.extract_helper import extract_method_information_from_interface
 from helpers.write_component_helper import WriteComponentHelper
@@ -39,12 +40,11 @@ class MethodsGenerator:
             escaped_interface = re.escape(self.interface_name)
             escaped_method = re.escape(method)
 
-            pattern = (
-                escaped_return_type + ' ' + escaped_interface + ':' + escaped_method + r'\([^)]*\)\s*{\n'
-                r'([\s\S]*?)'
-                r'\n\s+}'
+            header = (
+                rf"{escaped_return_type}\s+{escaped_interface}:{escaped_method}\([^)]*\)\s*"
             )
-            method_implementation_code = re.search(pattern, self.component_implementations).group(1)
+            pattern = rf"{header}(?P<bodycontent>\{{(?:[^{{}}]++|(?&bodycontent))*\}})"
+            method_implementation_code = regex.search(pattern, self.component_implementations).group(0)
 
             # se o método não altera o estado, o proxy deve apenas repassar a chamada da aplicação com base na carga
 
@@ -53,22 +53,16 @@ class MethodsGenerator:
 
             for attribute in self.attributes:
                 assignment_pattern = re.compile(fr"""
-                    ^   # Início da linha
-                    \s* # Espaço em branco opcional no início
-                    
-                    # O lado esquerdo da atribuição (variável, atributo, etc.)
-                    # Este padrão é simplificado para nomes de variáveis válidos.
-                    \b{re.escape(attribute)}\b # Nome de variável válido (ex: 'total', 'soma_global')
-                    
-                    \s* # Espaço em branco opcional
-                    
-                    # O operador de atribuição (o ponto principal da regex)
+                    ^
+                    .*?
+                    \s*
+                    \b{re.escape(attribute)}\b
+                    \s*
                     (
-                        \+= | -= | \*= | /= | # Operadores aumentados
-                        =(?!=)                 # O '=' simples, desde que não seja seguido por outro '=' (evita '==')
+                        \+= | -= | \*= | /= |
+                        =(?!=)
                     )
-                    
-                    .* # Qualquer coisa após a atribuição até o fim da linha
+                    .*
                 """, re.VERBOSE)
 
                 lines_with_state_change = []

@@ -46,7 +46,7 @@ strategy_configs = {
         "distribution_methods": [
             lambda file: WriteComponentHelper(file).provide_idented_flow("Response hashcast(Request r, int hashKey)", [
                 "int i = 0",
-                "mutex(pointerLock){ i = hashKey % remotes.arrayLength }",
+                "i = hashKey % remotes.arrayLength",
                 "ReqWrapper w = new ReqWrapper(r, remotes[i], i)",
                 "return rpcUtil.make(w)"
             ])
