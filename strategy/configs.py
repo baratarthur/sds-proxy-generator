@@ -21,6 +21,8 @@ strategy_configs = {
             { "lib": "libs.network.rpc.RPCUtil", "alias": "rpcUtil" },
             { "lib": "data.json.JSONEncoder", "alias": "je" },
             { "lib": "net.TCPSocket", "alias": "tcpSocket" },
+            { "lib": "time.Calendar", "alias": "ic" },
+            { "lib": "libs.utils.Logger", "alias": "logger" },
             { "lib": "libs.utils.Constants", "alias": None },
             { "lib": "libs.network.rpc.NonBlockRPC", "alias": "nbrpcLib" }
         ],
@@ -40,6 +42,8 @@ strategy_configs = {
             { "lib": "libs.network.rpc.RPCUtil", "alias": "rpcUtil" },
             { "lib": "data.json.JSONEncoder", "alias": "je" },
             { "lib": "net.TCPSocket", "alias": "tcpSocket" },
+            { "lib": "time.Calendar", "alias": "ic" },
+            { "lib": "libs.utils.Logger", "alias": "logger" },
             { "lib": "libs.utils.Constants", "alias": None },
             { "lib": "libs.network.rpc.NonBlockRPC", "alias": "nbrpcLib" }
         ],
