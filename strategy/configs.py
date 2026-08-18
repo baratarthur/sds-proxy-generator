@@ -6,8 +6,7 @@ default_config = {
             "int i = 0",
             "mutex(pointerLock){ i = addressPointer++ % remotes.arrayLength }",
             "ReqWrapper w = new ReqWrapper(r, remotes[i], i)",
-            "DateTime timestampBeforeAccessComponent = ic.getTime()",
-            "return rpcUtil.make(w, timestampBeforeAccessComponent)"
+            "return rpcUtil.make(w)"
         ]),
         lambda file: WriteComponentHelper(file).provide_idented_flow("Response[] nonBlockingBroadcastList(Request r)", [
             "NonBlockRPC nbrpc = new NonBlockRPC()",
@@ -49,8 +48,7 @@ strategy_configs = {
                 "int i = 0",
                 "mutex(pointerLock){ i = hashKey % remotes.arrayLength }",
                 "ReqWrapper w = new ReqWrapper(r, remotes[i], i)",
-                "DateTime timestampBeforeAccessComponent = ic.getTime()",
-                "return rpcUtil.make(w, timestampBeforeAccessComponent)"
+                "return rpcUtil.make(w)"
             ])
         ],
         "methods": {

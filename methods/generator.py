@@ -188,7 +188,7 @@ class MethodsGenerator:
                     remote_execution_type = special_methods[method]['distribution_type'] if method in special_methods else self.distribution_configs['methods'][distribution_type]
                 distribution_params = f"req{', ' + method_props['hashkey'] if strategy == 'fragment' and remote_execution_type == 'hashcast' else ''}"
                 remote_method_call = f"{'Response res = ' if should_return_value else ''}{remote_execution_type}({distribution_params})"
-                null_verification = "if (res.content == \"{}\") return null" if should_return_value else ''
+                null_verification = "if (res.content == \"{}\") return null" if should_return_value else None
                 function_return = f"return {method_props['returnParser'].format('res.content') if 'returnParser' in method_props else 'res.content'}" if should_return_value else None
 
                 methods.append(writer.provide_idented_flow(method_header, [
