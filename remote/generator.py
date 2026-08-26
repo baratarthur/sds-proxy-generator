@@ -17,6 +17,7 @@ class RemoteGenerator:
             # "libs.utils.Logger logger",
             # "data.IntUtil iu",
             "data.json.JSONEncoder je",
+            "libs.network.http.Queue",
             component_deps,
             connection_library,
             f"{component_package}.{component_name[0].upper() + component_name[1:]} remoteComponent",
@@ -37,8 +38,11 @@ class RemoteGenerator:
         
         inside_component(self.writer, [
             "bool serviceStatus = false",
+            "Queue processingQueues[] = new Queue[Constants.CONNECTION_POOL_SIZE]",
+            "int queueRobbinPointer = 0",
             "\n",
             self.provie_init_method(),
+            self.provide_handle_data(),
             self.provide_handle_request(),
             self.provide_processing_method(),
         ])
@@ -52,21 +56,39 @@ class RemoteGenerator:
                 'logger.error("Error: failed to bind master socket")',
                 "return"
             ]),
+            "",
+            self.writer.provide_idented_flow("for(int i = 0; i < Constants.CONNECTION_POOL_SIZE; i++)", [
+                'processingQueues[i] = new Queue()',
+                "asynch::handleRequest(i)"
+            ]),
+            "",
             'logger.info("$debugMSG - Server started on port $(iu.makeString(PORT))")',
             self.writer.provide_idented_flow("while (serviceStatus)", [
                 "TCPSocket client = new TCPSocket()",
-                "if (client.accept(host)) asynch::handleRequest(client)"
+                "if (client.accept(host)) handleData(client)"
             ])
         ])
 
+    def provide_handle_data(self):
+        return self.writer.provide_idented_flow("void handleData(TCPSocket client)", [
+            "int i = queueRobbinPointer++ % Constants.CONNECTION_POOL_SIZE",
+            "processingQueues[i].add(client)"
+        ])
+
     def provide_handle_request(self):
-        return self.writer.provide_idented_flow("void Remote:handleRequest(TCPSocket s)", [
-            "char requestContent[] = connection.receiveData(s)",
-            "if(requestContent == null) return",
-            "Request req = connection.parseRequestFromString(requestContent)",
-            "Response res = process(req)",
-            "char rawResponse[] = connection.buildRawResponse(res)",
-            "s.send(rawResponse)",
+        return self.writer.provide_idented_flow("void Remote:handleRequest(int queueIndex)", [
+            self.writer.provide_idented_flow("while (serviceStatus)", [
+                self.writer.provide_idented_flow(" if(processingQueues[queueIndex].getLength() > 0)", [
+                    "TCPSocket s = processingQueues[queueIndex].service()",
+                    "char requestContent[] = connection.receiveData(s)",
+                    "if(requestContent == null) return",
+                    "Request req = connection.parseRequestFromString(requestContent)",
+                    "Response res = process(req)",
+                    "char rawResponse[] = connection.buildRawResponse(res)",
+                    "s.send(rawResponse)",
+                ]),
+                "else timer.sleep(1)"
+            ])
         ])
 
     def provide_processing_method(self):
